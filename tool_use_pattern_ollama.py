@@ -132,14 +132,6 @@ class TravelAgentSystem:
                 "TravelAssistant",
                 "You are a helpful AI travel assistant. Add 'TERMINATE' when task is complete.",
             ),
-            "planning_agent": (
-                "PlanningAgent",
-                "You create optimal travel itineraries. Add 'TERMINATE' when planning is done.",
-            ),
-            "booking_agent": (
-                "BookingAgent",
-                "You handle booking queries. Add 'TERMINATE' when booking info is provided.",
-            ),
         }
 
         for attr, (name, sys_msg) in agents.items():
