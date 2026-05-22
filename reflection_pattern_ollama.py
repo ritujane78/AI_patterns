@@ -3,7 +3,7 @@ from typing import Annotated
 
 config_list = [
     {
-        "model" : "llama3.2:3b",
+        "model" : "llama3.1:8b",
         "base_url" : "http://localhost:11434/v1",
         "api_key" : "ollama"
     }
@@ -25,14 +25,15 @@ writer = AssistantAgent(
     llm_config =llm_config
 )
 
-reply = writer.generate_reply(messages = [{"content":task, "role":"user"}])
+# reply = writer.generate_reply(messages = [{"content":task, "role":"user"}])
+
 critic = AssistantAgent(
     name = "Critic",
     is_termination_msg = lambda x: x.get("content", "").find("TERMINATE") >= 0,
     llm_config = llm_config,
-    system_message = "You are a critic. You review the work of" \
-    "the writer and provide constructive feedback to help improve" \
-    "the quality of the content."
+    system_message = "You MUST directly review the article." \
+    "Do not ask clarifying questions." \
+    "Always provide actionable feedback."
 
 )
 # res = critic.initiate_chat(
@@ -75,6 +76,21 @@ def reflection_message(recipient, messages, sender, config):
     return f"""Review the following content. 
             \n\n {recipient.chat_messages_for_summary(sender)[-1]['content']}"""
 
+def meta_review_message(recipient, messages, sender, config):
+
+    review_summaries = recipient.chat_messages_for_summary(sender)
+
+    formatted_reviews = ""
+
+    for review in review_summaries:
+        formatted_reviews += review.get("content", "") + "\n\n"
+
+    return f"""
+    Aggregate the following reviewer feedback
+    and provide final suggestions.
+
+    {formatted_reviews}
+    """
 
 review_chats = [
     {
@@ -99,7 +115,7 @@ review_chats = [
     },
     {
         "recipient": meta_reviewer,
-        "message": "Aggregrate feedback from all reviewers and give final suggestions on the writing.",
+        "message": meta_review_message,
         "max_turns": 1,
     },
 ]
