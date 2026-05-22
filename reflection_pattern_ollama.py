@@ -1,9 +1,5 @@
-import os
 from autogen import ConversableAgent, AssistantAgent
 from typing import Annotated
-from dotenv import load_dotenv
-
-load_dotenv()
 
 config_list = [
     {
